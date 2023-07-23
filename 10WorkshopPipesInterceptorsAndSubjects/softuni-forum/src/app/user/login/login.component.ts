@@ -7,23 +7,22 @@ import { DEFAULT_EMAIL_DOMAINS } from 'src/app/shared/constants';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-
   appEmailDomains = DEFAULT_EMAIL_DOMAINS;
 
-  constructor(private userService: UserService, private router: Router) {
-
-  }
+  constructor(private userService: UserService, private router: Router) {}
 
   login(form: NgForm): void {
-
-    if(form.invalid) {
+    if (form.invalid) {
       return;
     }
 
-    this.userService.login()
-    this.router.navigate(['/'])
+    const { email, password } = form.value;
+
+    this.userService.login(email, password).subscribe(() => {
+      this.router.navigate(['/themes']);
+    });
   }
 }
