@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { DEFAULT_EMAIL_DOMAINS } from 'src/app/shared/constants';
 import { appEmailValidator } from 'src/app/shared/validators/app-email-validator';
+import { UserService } from '../user.service';
 
 interface Profile {
   username: string;
@@ -15,27 +16,45 @@ interface Profile {
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
   isEditMode: boolean = false;
 
   profileDetails: Profile = {
-    username: 'John',
-    email: 'john.doe@gmail.com',
+    username: '',
+    email: '',
     telExt: '00359',
-    tel: '888 888 888',
+    tel: '',
   };
 
   form = this.fb.group({
-    username: [
+    username: ['', [Validators.required, Validators.minLength(5)]],
+    email: [
       '',
-      [Validators.required, Validators.minLength(5)],
+      [Validators.required, appEmailValidator(DEFAULT_EMAIL_DOMAINS)],
     ],
-    email: ['', [Validators.required, appEmailValidator(DEFAULT_EMAIL_DOMAINS)]],
     telExt: [''],
     tel: [''],
   });
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private userService: UserService) {}
+
+  ngOnInit(): void {
+    const { username, email, tel } = this.userService.user!;
+
+    this.profileDetails = {
+      username,
+      email,
+      telExt: '00359',
+      tel,
+    };
+
+    this.form.setValue({
+      username,
+      email,
+      telExt: '00359',
+      tel,
+    });
+  }
 
   toggleEditMode(): void {
     this.isEditMode = !this.isEditMode;
@@ -47,7 +66,10 @@ export class ProfileComponent {
     }
 
     this.profileDetails = { ...this.form.value } as Profile;
+    const { username, email, tel } = this.profileDetails;
 
-    this.toggleEditMode();
+    this.userService.updateProfile(username!, email!, tel!).subscribe(() => {
+      this.toggleEditMode();
+    });
   }
 }

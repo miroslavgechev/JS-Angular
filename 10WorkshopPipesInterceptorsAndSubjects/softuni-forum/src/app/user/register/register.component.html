@@ -69,12 +69,12 @@
 
             </ng-container>
 
-            <button [disabled]="form.invalid" [style]="{background: form.invalid ? 'grey' : 'green'}">Create
+            <button  [disabled]="form.invalid" [style]="{background: form.invalid ? 'grey' : 'green'}">Create
                 Account</button>
 
             <p class="text-center">
                 Have an account?
-                <a routerLink="/login">Log In</a>
+                <a routerLink="/auth/login">Log In</a>
             </p>
 
         </fieldset>
